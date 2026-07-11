@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Laboratorio 4 - Chatbot IA OWASP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --bg:#f4efe7;
+  --bg2:#ede5db;
+  --surface:#fffdf9;
+  --surface2:#fbf7f0;
+  --surface3:#fff7ec;
+  --text:#211815;
+  --muted:#5d514b;
+  --red:#7a0f12;
+  --red2:#5b0709;
+  --red3:#3f0507;
+  --gold:#f28c18;
+  --gold2:#b85f00;
+  --border:#d9cbbd;
+  --border2:#c8b7a6;
+  --ok:#0f766e;
+  --ok-bg:#e7f6f1;
+  --danger:#b42318;
+  --danger-bg:#fde8e5;
+  --neutral:#4f463f;
+  --code:#1f1714;
+  --code2:#2b201c;
+  --code-text:#fff8ee;
+  --shadow:0 14px 34px rgba(58,34,22,.11);
+  --shadow-soft:0 8px 22px rgba(58,34,22,.075);
+  font-family:"Segoe UI",Arial,sans-serif;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  color:var(--text);
+  background:
+    radial-gradient(circle at -6% 0%,transparent 0 115px,rgba(122,15,18,.14) 116px 118px,transparent 119px),
+    radial-gradient(circle at -6% 0%,transparent 0 185px,rgba(122,15,18,.105) 186px 188px,transparent 189px),
+    radial-gradient(circle at -6% 0%,transparent 0 255px,rgba(122,15,18,.075) 256px 258px,transparent 259px),
+    linear-gradient(135deg,var(--bg),var(--bg2));
+  background-attachment:fixed;
+}
+
+.page{
+  max-width:1500px;
+  margin:auto;
+  padding:28px 24px 40px;
+}
+
+.hero{
+  display:grid;
+  grid-template-columns:1.45fr .85fr;
+  gap:22px;
+  margin-bottom:24px;
+  align-items:start;
+}
+
+.hero h1{
+  margin:0;
+  font-size:clamp(2rem,4vw,3.55rem);
+  line-height:1.04;
+  font-weight:900;
+  letter-spacing:-.035em;
+  color:#170f0d;
+}
+
+.hero p{
+  margin:12px 0 0;
+  font-size:1.12rem;
+  line-height:1.45;
+  color:#332722;
+  max-width:920px;
+}
+
+.brand{
+  text-align:right;
+  color:var(--red);
+  font-weight:900;
+  font-size:2.75rem;
+  line-height:.94;
+  letter-spacing:-.03em;
+}
+
+.brand small{
+  display:block;
+  margin-top:8px;
+  color:#6c1a1a;
+  font-size:.9rem;
+  font-weight:800;
+  line-height:1.25;
+  text-transform:uppercase;
+  letter-spacing:.01em;
+}
+
+.tag{
+  display:inline-block;
+  background:linear-gradient(180deg,var(--red),var(--red2));
+  color:#fff;
+  border-radius:999px;
+  padding:9px 15px;
+  font-size:.8rem;
+  margin-top:12px;
+  box-shadow:var(--shadow-soft);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:.95fr 1.05fr;
+  gap:22px;
+  align-items:start;
+}
+
+.stack{display:grid;gap:22px}
+
+.card{
+  background:rgba(255,253,249,.94);
+  border:1px solid var(--border);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+
+.head{
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,0)),
+    linear-gradient(180deg,var(--red),var(--red2));
+  color:white;
+  padding:15px 20px;
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:center;
+  border-bottom:3px solid var(--gold);
+}
+
+.head h2,.head h3{
+  margin:0;
+  font-size:1.08rem;
+  font-weight:850;
+  letter-spacing:-.01em;
+}
+
+.eye{
+  font-size:.76rem;
+  font-weight:850;
+  opacity:.92;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+.body{padding:19px}
+
+label{
+  display:block;
+  margin:15px 0 7px;
+  font-weight:850;
+  color:#2a1d19;
+}
+
+select,textarea,input{
+  width:100%;
+  border:1px solid var(--border2);
+  border-radius:12px;
+  padding:12px 14px;
+  background:#fffefa;
+  color:#1e1512;
+  font-size:.96rem;
+  outline:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+select:focus,textarea:focus,input:focus{
+  border-color:var(--red);
+  box-shadow:0 0 0 4px rgba(122,15,18,.12);
+}
+
+textarea{
+  min-height:112px;
+  font-family:Consolas,"Courier New",monospace;
+  line-height:1.4;
+  resize:vertical;
+}
+
+button{
+  border:0;
+  border-radius:13px;
+  padding:11px 15px;
+  background:linear-gradient(180deg,var(--red),var(--red2));
+  color:white;
+  font-weight:850;
+  cursor:pointer;
+  box-shadow:0 10px 22px rgba(122,15,18,.20);
+  transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+
+button:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.03);
+  box-shadow:0 12px 25px rgba(122,15,18,.24);
+}
+
+button:active{transform:translateY(0)}
+
+.secondary{
+  background:linear-gradient(180deg,#6a5a50,#4f433c);
+  box-shadow:0 9px 20px rgba(79,67,60,.20);
+}
+
+.ok{
+  background:linear-gradient(180deg,#15877e,#0f665f);
+  box-shadow:0 9px 20px rgba(15,118,110,.20);
+}
+
+.warning{
+  background:linear-gradient(180deg,var(--gold),var(--gold2));
+  box-shadow:0 9px 20px rgba(242,140,24,.22);
+}
+
+.danger{
+  background:linear-gradient(180deg,#d83a2e,var(--danger));
+  box-shadow:0 9px 20px rgba(180,35,24,.22);
+}
+
+.btns{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+
+.quick{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.info{
+  margin-top:14px;
+  background:var(--surface3);
+  border:1px solid #efc891;
+  color:#603000;
+  border-radius:15px;
+  padding:13px 14px;
+  line-height:1.45;
+  font-size:.94rem;
+}
+
+.pill{
+  background:#f4e6e4;
+  color:var(--red);
+  border:1px solid #e4c8c4;
+  border-radius:999px;
+  padding:7px 11px;
+  font-weight:900;
+  font-size:.78rem;
+  white-space:nowrap;
+}
+
+#answerBox{
+  min-height:135px;
+  background:#fffefa;
+  border:1px dashed rgba(122,15,18,.45);
+  border-radius:15px;
+  padding:16px;
+  line-height:1.55;
+  color:#211815;
+}
+
+pre{
+  margin:0;
+  white-space:pre-wrap;
+  word-break:break-word;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0)),
+    var(--code);
+  color:var(--code-text);
+  padding:17px;
+  border-radius:15px;
+  min-height:190px;
+  max-height:540px;
+  overflow:auto;
+  font-size:.9rem;
+  line-height:1.48;
+  border:1px solid #3d2d27;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.025);
+}
+
+.matrix{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  font-size:.89rem;
+  border:1px solid var(--border);
+  border-radius:15px;
+  overflow:hidden;
+  background:#fffefa;
+}
+
+.matrix th{
+  background:#fff0dc;
+  color:#6f3500;
+  text-align:left;
+  font-weight:900;
+  border-bottom:1px solid #e7c89f;
+}
+
+.matrix th,.matrix td{
+  border-bottom:1px solid #eee1d4;
+  padding:10px;
+  vertical-align:top;
+}
+
+.matrix tr:last-child td{border-bottom:0}
+.matrix tr:hover td{background:#fff8ef}
+
+.v{
+  display:inline-block;
+  background:var(--danger-bg);
+  color:#8f1d14;
+  border:1px solid #f3b8b1;
+  border-radius:999px;
+  padding:4px 8px;
+  font-weight:900;
+  font-size:.75rem;
+  margin-bottom:4px;
+}
+
+.s{
+  display:inline-block;
+  background:var(--ok-bg);
+  color:#0b5b54;
+  border:1px solid #b5dfd7;
+  border-radius:999px;
+  padding:4px 8px;
+  font-weight:900;
+  font-size:.75rem;
+  margin-bottom:4px;
+}
+
+.small{
+  font-size:.78rem;
+  padding:8px 10px;
+}
+
+.full{grid-column:1/-1}
+
+.footer{
+  margin-top:24px;
+  border:2px solid var(--gold);
+  border-radius:17px;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:220px 1fr;
+  background:var(--surface);
+  box-shadow:var(--shadow);
+}
+
+.footer b{
+  background:#fff3e2;
+  color:#a45100;
+  padding:19px;
+  text-align:center;
+  font-size:1.05rem;
+}
+
+.footer span{
+  padding:19px 22px;
+  font-weight:850;
+  color:#2d211c;
+}
+
+.footnote{
+  display:flex;
+  justify-content:space-between;
+  color:var(--red);
+  margin-top:16px;
+  font-weight:750;
+  gap:16px;
+}
+
+@media(max-width:1100px){
+  .hero,.grid{grid-template-columns:1fr}
+  .brand{text-align:left}
+  .footer{grid-template-columns:1fr}
+}
+
+@media(max-width:700px){
+  .page{padding:20px 14px 30px}
+  .quick{grid-template-columns:1fr}
+  .footnote{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="hero">
+<div><h1>Laboratorio 4: Chatbot IA y OWASP</h1><p>Escenarios completos para comparar vulnerabilidad y control seguro en aplicaciones web con IA.</p></div>
+<div class="brand">UNMSM<small>Unidad de Post Grado<br>Ingeniería de Sistemas e Informática</small><span class="tag">Seguridad en aplicaciones web · OWASP Top 10</span></div>
+</header>
+<div class="grid">
+<div class="stack">
+<section class="card"><div class="head"><div><div class="eye">Panel de pruebas</div><h2>Enviar solicitud al asistente</h2></div><span class="pill">Laboratorio controlado</span></div>
+<div class="body">
+<label>Escenario guiado</label><select id="scenarioSelect" onchange="loadScenarioFromSelect()"><option value="">Selecciona una combinación de prueba...</option></select>
+<div id="scenarioInfo" class="info" style="display:none"></div>
+<label>Modo</label><select id="mode"><option value="vulnerable">Endpoint vulnerable: /api/ai/assistant</option><option value="secure">Endpoint seguro: /api/ai/assistant-secure</option></select>
+<label>Token</label><select id="token"><option value="token_alumno">Bearer token_alumno</option><option value="token_docente">Bearer token_docente</option><option value="token_admin">Bearer token_admin</option><option value="">Sin token</option></select>
+<label>Rol enviado por el cliente</label><select id="userRole"><option value="student">student</option><option value="teacher">teacher</option><option value="admin">admin</option></select>
+<label>Pregunta</label><textarea id="question">¿Cuál es el objetivo de la sesión 4?</textarea>
+<div class="btns"><button onclick="sendRequest()">Enviar request</button><button class="ok" onclick="compareCurrent()">Comparar vulnerable vs seguro</button></div>
+<label style="margin-top:18px">Pruebas rápidas</label><div class="quick"><button class="secondary" onclick="loadQuick('S01')">1. Manipulación de rol</button><button class="secondary" onclick="loadQuick('S04')">2. Prompt Injection</button><button class="secondary" onclick="loadQuick('S06')">3. Salida insegura</button><button class="secondary" onclick="loadQuick('S08')">4. Exceso de contexto</button></div>
+<div class="info">Primero ejecuta en <strong>vulnerable</strong>, luego en <strong>seguro</strong>. Usa <strong>Comparar vulnerable vs seguro</strong> para ver ambos resultados con la misma entrada.</div>
+</div></section>
+<section class="card"><div class="head"><div><div class="eye">Matriz</div><h3>Combinaciones seguridad/vulnerabilidad</h3></div></div><div class="body"><table class="matrix"><thead><tr><th>Escenario</th><th>Vulnerable</th><th>Seguro</th><th></th></tr></thead><tbody id="scenarioTable"></tbody></table></div></section>
+<section class="card"><div class="head"><div><div class="eye">Request</div><h3>Request enviado</h3></div></div><div class="body"><pre id="requestBox"></pre></div></section>
+</div>
+<div class="stack">
+<section class="card"><div class="head"><div><div class="eye">Visualización</div><h2>Salida mostrada al usuario</h2></div><span class="pill">Render</span></div><div class="body"><div id="answerBox">Aquí aparecerá la respuesta.</div><div class="info">En modo vulnerable la salida se inserta como HTML. En modo seguro se muestra como texto controlado.</div></div></section>
+<section class="card"><div class="head"><div><div class="eye">Response</div><h3>Response JSON</h3></div></div><div class="body"><pre id="responseBox"></pre></div></section>
+<section class="card"><div class="head"><div><div class="eye">Comparación</div><h3>Vulnerable vs seguro</h3></div></div><div class="body"><pre id="compareBox"></pre></div></section>
+</div>
+<section class="card full"><div class="head"><div><div class="eye">Trazabilidad</div><h2>Logs del laboratorio</h2></div><span class="pill">Evidencia técnica</span></div><div class="body"><div class="btns" style="margin-top:0;margin-bottom:14px"><button class="warning" onclick="loadLogs()">Ver logs</button><button class="danger" onclick="resetLogs()">Limpiar logs</button></div><pre id="logsBox"></pre></div></section>
+</div>
+<div class="footer"><b>Idea clave</b><span>La IA no debe recibir todo, no debe decidir todo y no debe ejecutar todo: la seguridad debe estar en la arquitectura, el backend y la evidencia técnica.</span></div>
+<div class="footnote"><span>Curso: Seguridad en aplicaciones web · OWASP Top 10</span><span>Docente: Mg. Keith Fernández</span></div>
+</div>
+<script>
+let SCENARIOS=[];
+function getEndpoint(){return document.getElementById("mode").value==="secure"?"/api/ai/assistant-secure":"/api/ai/assistant";}
+function payload(){return{question:document.getElementById("question").value,course_id:"owasp-top10",user_role:document.getElementById("userRole").value};}
+function headers(){const h={"Content-Type":"application/json"};const t=document.getElementById("token").value;if(t)h["Authorization"]="Bearer "+t;return h;}
+function setInfo(s){const b=document.getElementById("scenarioInfo");if(!s){b.style.display="none";b.innerHTML="";return}b.style.display="block";b.innerHTML=`<strong>${s.id} · ${s.title}</strong><br><strong>OWASP Web:</strong> ${s.web}<br><strong>OWASP LLM:</strong> ${s.llm}<br><strong>Evidencia:</strong> ${s.evidence}`;}
+function apply(id,mode=null){const s=SCENARIOS.find(x=>x.id===id);if(!s)return;document.getElementById("scenarioSelect").value=s.id;document.getElementById("token").value=s.token;document.getElementById("userRole").value=s.role;document.getElementById("question").value=s.question;if(mode)document.getElementById("mode").value=mode;setInfo(s);}
+function loadScenarioFromSelect(){const id=document.getElementById("scenarioSelect").value;if(id)apply(id);else setInfo(null);}
+function loadQuick(id){apply(id,"vulnerable");}
+async function sendRequest(){const ep=getEndpoint();const h=headers();const p=payload();document.getElementById("requestBox").textContent="POST "+ep+"\\n"+JSON.stringify({headers:h,body:p},null,2);const res=await fetch(ep,{method:"POST",headers:h,body:JSON.stringify(p)});const data=await res.json();document.getElementById("responseBox").textContent=JSON.stringify(data,null,2);const a=data.answer||data.error||"";const box=document.getElementById("answerBox");if(document.getElementById("mode").value==="secure")box.textContent=a;else box.innerHTML=a;}
+async function compareCurrent(){const h=headers(),p=payload();document.getElementById("requestBox").textContent="POST /api/lab/compare\\n"+JSON.stringify({headers:h,body:p},null,2);const res=await fetch("/api/lab/compare",{method:"POST",headers:h,body:JSON.stringify(p)});const data=await res.json();document.getElementById("compareBox").textContent=JSON.stringify(data,null,2);}
+async function loadLogs(){const res=await fetch("/logs");document.getElementById("logsBox").textContent=JSON.stringify(await res.json(),null,2);}
+async function resetLogs(){await fetch("/reset-logs",{method:"POST"});document.getElementById("logsBox").textContent="Logs limpiados.";}
+async function init(){const res=await fetch("/api/lab/scenarios");const data=await res.json();SCENARIOS=data.scenarios||[];const sel=document.getElementById("scenarioSelect"),tb=document.getElementById("scenarioTable");SCENARIOS.forEach(s=>{const op=document.createElement("option");op.value=s.id;op.textContent=s.id+" · "+s.title;sel.appendChild(op);const tr=document.createElement("tr");tr.innerHTML=`<td><strong>${s.id}</strong><br>${s.title}<br><span style="color:#5f5a56">${s.web}<br>${s.llm}</span></td><td><span class="v">Vulnerable</span><br>${s.vuln}</td><td><span class="s">Seguro</span><br>${s.safe}</td><td><button class="secondary small" onclick="apply('${s.id}','vulnerable')">Cargar</button></td>`;tb.appendChild(tr);});}
+init();
+</script>
+</body></html>
